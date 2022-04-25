@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import './App.css';
-import { Grommet, Box, Button, Heading, Collapsible, BoxExtendedProps, ResponsiveContext, Layer, Card, CardBody, CardFooter, Grid, Text, Anchor, Footer, Main, ThemeType} from 'grommet';
-import { Notification, FormClose, Domain, PhoneVertical, Test, LineChart, Linkedin, Github, ServerCluster, System, Menu} from 'grommet-icons';
+import { Grommet, Box, Button, Heading, Collapsible, BoxExtendedProps, ResponsiveContext, Layer, Text } from 'grommet';
+import { FormClose, Menu} from 'grommet-icons';
 import { Social } from "./Social";
 import { theme } from "./GlobalTheme";
 import { CardGrid } from "./CardGrid";
-
-
+import { CardDetail } from "./CardDetail";
+import { IExperience } from "./data/cardData";
 
 
 const AppBar = (props: JSX.IntrinsicAttributes & BoxExtendedProps & { children?: React.ReactNode; }) => (
@@ -23,14 +23,10 @@ const AppBar = (props: JSX.IntrinsicAttributes & BoxExtendedProps & { children?:
   />
 );
 
-
-
-//F9EAF3
-
-
 function App() {
   const [showSidebar, setShowSidebar] = useState(false);
-  const [isNarrow, setIsNarrow] = useState(true)
+  const [cardSelected, setCardSelected] = useState<IExperience|null>(null);
+  const [contentHeight, setContentHeight] = useState<number|null>(null);
 
   function getContentDirection(size: string) {
     if(size == 'small') return 'column'
@@ -39,6 +35,11 @@ function App() {
   function isMobile() {
     return window.innerWidth < 1536;
   } 
+
+  const toggleDisplay = (card: IExperience|null, height?: number|undefined) => {
+    if(height) setContentHeight(height)
+    setCardSelected(card);
+  }
 
   return (
       <Grommet theme={theme} full={!isMobile()}>  
@@ -52,7 +53,6 @@ function App() {
               <Button icon={<Menu/>} onClick={() => {setShowSidebar(!showSidebar)}} />
             </AppBar>
 
-            
             <Box direction={getContentDirection(size)} flex>
               <Box flex align='center' justify="center" >
                 <Box border={{color: "card_over", size: "large"}} background={"white"} pad="large" >
@@ -66,8 +66,11 @@ function App() {
               <Box flex align='center' justify='center' >
                 <Box pad='large' fill justify="center" height={'xlarge'}>
                   <Box background={"white"} round pad="medium" border={{color: "#d470a2", size: "medium"}} overflow={{vertical: 'auto'}} >
-                    <Heading level={3} size={'medium'}>What I'm excited about:</Heading>
-                    <CardGrid />
+                    {cardSelected == null ? (
+                      <CardGrid clickFunc={toggleDisplay}/> 
+                    ):
+                      <CardDetail experience={cardSelected} onBack={() => toggleDisplay(null)} height={contentHeight}/>
+                    }
                   </Box>
                 </Box>
               </Box>
